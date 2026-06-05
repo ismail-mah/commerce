@@ -1,7 +1,24 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+<div class="container">
+        <h2>Active Listings</h2>
+        <div class="row">
+            {% for list in listings %}
+                <div class="col-md-4 mb-4 d-flex">
+                    <div class="card w-100">
+                        <img src="{{ list.image_url }}" class="card-img-top" alt="{{ list.title }}">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">{{ list.title }}</h5>
+                            <!-- <p class="card-text">{{ list.description }}</p> -->
+                            <p class="card-text">Starting Bid: ${{ list.starting_bid }}</p>
+                            <p class="text-muted">Created: {{ list.created_at }}</p>
+                            <a href="#" class="btn btn-primary mt-auto">View Listing</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
 
-    TODO
+    </div>
 {% endblock %}

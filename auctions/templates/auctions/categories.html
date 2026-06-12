@@ -1,0 +1,19 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}Categories{% endblock %}
+
+{% block  body %}
+    <h2>Categories</h2>
+    {% if categories %}
+        <ul class="list-group">
+            {% for category in categories %}
+                <li class="list-group-item">
+                    <a href="#">{{ category.name }}</a>
+                    <span class="badge badge-secondary">{{ category.listings.count }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No categories available.</p>
+    {% endif %}
+{% endblock  %}

@@ -1,0 +1,13 @@
+{% extends "auctions/layout.html" %}
+
+{% block  body %}
+    <div class="container py-4">
+        <h2 class="mb-4 text-center">Error</h2>
+        <div class="alert alert-danger" role="alert">
+            {{ message }}
+        </div>
+        <div class="text-center">
+            <a href="{% url 'index' %}" class="btn btn-primary">Back to Home</a>
+        </div>
+    </div>
+{% endblock  %}

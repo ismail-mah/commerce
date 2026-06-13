@@ -28,7 +28,10 @@
                 </li>
                 {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'watchlist' %}">Watchlist</a>
+                    <a class="nav-link" href="{% url 'watchlist' %}">Watchlist
+                        <span class="badge badge-secondary">{{ request.user.watched_listings.count }}</span>
+
+                    </a>
                 </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'create_listing' %}">Create Listing</a>
@@ -47,7 +50,25 @@
             </ul>
         </div>
         <hr>
+
+        {% if messages %}
+            {% for message in messages  %}
+                <div class="container">
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <p class="text-center align-items-center"><strong>{{ message }}</strong></p>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
         {% block body %}
         {% endblock %}
+
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
     </body>
 </html>

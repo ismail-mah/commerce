@@ -4,10 +4,17 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .forms import ListingForm, CategoryForm
 from django.urls import reverse
 
 
+
+# Helper function to render error messages
+def render_error(request, message):
+    return render(request, "auctions/error.html", {
+        "message": message
+    })
 
 def index(request):
     activate_listings = Listing.objects.filter(active=True).order_by('-id')
@@ -37,10 +44,12 @@ def create_category(request):
     form = CategoryForm(request.POST or None)
     if request.POST.get("name") and form.is_valid():
         form.save()
+        messages.success(request, "Category created successfully.")
         return redirect("categories")
     return render(request, "auctions/create_category.html", {
         "form": form,
-        "title": "Create Category"
+        "title": "Create Category",
+        "error": "Please enter a category name."
     })
 
 
@@ -58,10 +67,11 @@ def create_listing(request):
     if request.method == "POST":
         form = ListingForm(request.POST)
         if form.is_valid():
-             listing = form.save(commit=False)
-             listing.owner = request.user
-             listing.save()
-             return redirect("listing", listing_id=listing.id)
+            listing = form.save(commit=False)
+            listing.owner = request.user
+            listing.save()
+            messages.success(request, "Listing created successfully.")
+            return redirect("listing", listing_id=listing.id)
     else:
         form = ListingForm()
 
@@ -81,7 +91,19 @@ def watchlist(request):
 @login_required
 def add_to_watchlist(request, listing_id):
     listing = Listing.objects.get(id=listing_id)
-    listing.watcherlist.add(request.user)
+    if listing.watcherlist.filter(id=request.user.id).exists():
+        messages.info(request, "Listing is already in your watchlist.")
+    else:
+        listing.watcherlist.add(request.user)
+        messages.success(request, "Listing added to watchlist.")
+    return redirect("watchlist")
+
+
+
+def remove_from_watchlist(request, listing_id):
+    listing = Listing.objects.get(id=listing_id)
+    listing.watcherlist.remove(request.user)
+    messages.success(request, "Listing removed from watchlist.")
     return redirect("watchlist")
 
     

@@ -4,7 +4,8 @@
 
 {% block body %}
     <div class="container py-4">
-        <h2 class="mb-4 text-center">Your Watchlist</h2>
+        <h2 class="mb-4 text-center">Watchlist Adam och ibrahim</h2>
+        <hr class="mb-3">
         {% if watchlist %}
             <div class="row">
                 {% for listing in watchlist %}
@@ -22,7 +23,10 @@
                                         <p class="text-muted"><i class="fa fa-hourglass-end"></i> Ends at: {{ listing.end_time }}</p>
                                     {% endif %}
                                 {% endif %}
-                                <a href="{% url 'listing' listing.id %}" class="btn btn-primary mt-auto">View Listing</a>
+                                <div class="d-flex gap-2 mt-auto">
+                                    <a href="{% url 'listing' listing.id %}" class="btn btn-primary flex-fill text-center">View Listing</a>
+                                    <a href="{% url 'remove_from_watchlist' listing.id %}" class="btn btn-danger flex-fill text-center">Remove from Watchlist</a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -30,7 +34,7 @@
             </div>
 
             {% else %}
-            <p>You have no items in your watchlist.</p>
+            <p class="text-muted text-center">You have no items in your watchlist.</p>
         {% endif %}
     </div>
 {% endblock %}

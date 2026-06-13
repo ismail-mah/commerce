@@ -14,7 +14,11 @@
                         <div class="mb-3">
                             {{ form.name.label_tag }}
                             {{ form.name }}
-                            {{ form.name.errors }}
+                            {% if form.name.errors %}
+                                <div class="text-danger mt-1">
+                                    {{ form.name.errors }}
+                                </div>
+                            {% endif %}
                         </div>
                         <button class="btn btn-primary" type="submit">
                             <i class="bi bi-plus-lg me-1"></i>

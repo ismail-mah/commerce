@@ -1,0 +1,38 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}Listing{% endblock %}
+
+{% block body %}
+
+    <div class="container py-4">
+        <div class="card shadow border-0">
+            <div class="row g-0">
+                <div class="col-md-6 p-3">
+                    <img src="{{ listing.image_url }}" alt="{{ listing.title }}" class="img-fluid">
+                </div>
+
+                <div class="col-md-6 p-3">
+                    <div class="card-body-py-4">
+                        <h4 class="card-title mb-3 border-bottom pb-2">{{ listing.title }}</h4>
+                        <p>{{ listing.description }}</p>
+                        <p><strong>Price:</strong> ${{ listing.price }}</p>
+                        <p><strong>Category:</strong> {{ listing.category }}</p>
+                        <p><strong>Created at:</strong> {{ listing.created_at }}</p>
+                        {% if listing.end_time %}
+                        {% if listing.is_expired %}
+                        <p class="text-danger mb-0"><i class="fa fa-hourglass-end"></i> Ended at: {{ listing.end_time }}</p>
+                        {% else %}
+                        <p class="text-muted mb-0"><i class="fa fa-hourglass-half"></i> Ends at: {{ listing.end_time }}</p>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                    <p><strong>Owner:</strong> {{ listing.owner.username }}</p>
+                    <div class="mt-4">
+                        <a href="" class="btn btn-primary">Place Bid</a>
+                        <a href="{% url 'add_to_watchlist' listing.id %}" class="btn btn-secondary">Add to Watchlist</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

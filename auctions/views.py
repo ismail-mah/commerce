@@ -4,24 +4,51 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .forms import ListingForm
+from .forms import ListingForm, CategoryForm
 from django.urls import reverse
 
 
 
 def index(request):
-    activate_listings = Listing.objects.filter(active=True)
+    activate_listings = Listing.objects.filter(active=True).order_by('-id')
     return render(request, "auctions/index.html", {
         "listings": activate_listings
     })
 
+
+
 def categories(request):
-    categories = Category.objects.all()
+    categories = Category.objects.all().order_by('name')
     return render(request, "auctions/categories.html", {
         "categories": categories
     })
 
 
+def category_listings(request, category_id):
+    category = Category.objects.get(id=category_id)
+    listings = Listing.objects.filter(category=category, active=True)
+    return render(request, "auctions/category_listings.html", {
+        "category": category,
+        "listings": listings
+    })
+
+@login_required
+def create_category(request):
+    form = CategoryForm(request.POST or None)
+    if request.POST.get("name") and form.is_valid():
+        form.save()
+        return redirect("categories")
+    return render(request, "auctions/create_category.html", {
+        "form": form,
+        "title": "Create Category"
+    })
+
+
+def listing(request, listing_id):
+    single_listing = Listing.objects.get(id=listing_id)
+    return render(request, "auctions/listing.html", {
+        "listing": single_listing
+    })
 
 
 
@@ -34,7 +61,7 @@ def create_listing(request):
              listing = form.save(commit=False)
              listing.owner = request.user
              listing.save()
-             return redirect("index")
+             return redirect("listing", listing_id=listing.id)
     else:
         form = ListingForm()
 
@@ -46,7 +73,17 @@ def create_listing(request):
 
 @login_required
 def watchlist(request):
-    return render(request, "auctions/watchlist.html")
+    listings = request.user.watched_listings.all()
+    return render(request, "auctions/watchlist.html", {
+        "watchlist": listings
+    })
+
+@login_required
+def add_to_watchlist(request, listing_id):
+    listing = Listing.objects.get(id=listing_id)
+    listing.watcherlist.add(request.user)
+    return redirect("watchlist")
+
     
 
 def login_view(request):

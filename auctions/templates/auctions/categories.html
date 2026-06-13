@@ -3,17 +3,36 @@
 {% block title %}Categories{% endblock %}
 
 {% block  body %}
-    <h2>Categories</h2>
-    {% if categories %}
-        <ul class="list-group">
-            {% for category in categories %}
-                <li class="list-group-item">
-                    <a href="#">{{ category.name }}</a>
-                    <span class="badge badge-secondary">{{ category.listings.count }}</span>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No categories available.</p>
-    {% endif %}
+    <div class="container">
+        <h2 class="mb-4 text-center">Categories</h2>
+        <span class="text-muted small d-none d-md-inline">
+            <a href="{% url 'create_category' %}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-plus-lg"></i> Add New Category
+            </a>
+        </span>
+        <hr class="mb-4">
+        {% if categories %}
+            <div class="container">
+                <div class="row">
+                    {% for category in categories %}
+                        <div class="col-md-3 mx-auto">
+    
+                            <div class="card mb-3 shadow-sm position-relative">
+                                <div class="card-body text-center">
+                                    <a class="text-decoration-none stretched-link" href="{% url 'category_listings' category.id %}">{{ category.name }}</a>
+                                    <span class="badge badge-secondary">{{ category.listings.count }}</span>
+                
+                                </div>
+    
+                            </div>
+                        </div>
+                    {% endfor %}
+    
+                </div>
+            </div>
+        {% else %}
+            <p>No categories available.</p>
+        {% endif %}
+
+    </div>
 {% endblock  %}

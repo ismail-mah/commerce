@@ -20,7 +20,7 @@
             <div class="row">
                 {% for listing in listings %}
                     <div class="col-md-4 mb-4 d-flex">
-                        <div class="card card-hover w-100">
+                        <div class="card card-hover w-100 position-relative">
                             <img src="{{ listing.image_url }}" class="card-img-top" alt="{{ listing.title }}">
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">{{ listing.title }}</h5>
@@ -33,7 +33,7 @@
                                         <p class="text-muted"><i class="fa fa-hourglass-half"></i> Ends at: {{ listing.end_time }}</p>
                                     {% endif %}
                                 {% endif %}
-                                <a href="{% url 'listing' listing.id %}" class="btn btn-primary mt-auto">View Listing</a>
+                                <a href="{% url 'listing' listing.id %}" class="btn btn-primary mt-auto stretched-link">View Listing</a>
                             </div>
                         </div>
                     </div>

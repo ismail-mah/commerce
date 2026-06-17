@@ -35,7 +35,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link mx-2
-                                {% if request.resolver_match.url_name == 'categories' %}active{% endif %}" 
+                                {% if request.resolver_match.url_name == 'categories' or request.resolver_match.url_name == 'category_listings' %}active{% endif %}"
                                 href="{% url 'categories' %}">Categories
                             </a>
                         </li>

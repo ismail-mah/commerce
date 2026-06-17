@@ -36,7 +36,8 @@ def category_listings(request, category_id):
     listings = Listing.objects.filter(category=category, active=True)
     return render(request, "auctions/category_listings.html", {
         "category": category,
-        "listings": listings
+        "listings": listings,
+        "categories": Category.objects.all().order_by('name')
     })
 
 @login_required
@@ -83,7 +84,7 @@ def create_listing(request):
 
 @login_required
 def watchlist(request):
-    listings = request.user.watched_listings.all()
+    listings = request.user.watched_listings.all().order_by('-id')
     return render(request, "auctions/watchlist.html", {
         "watchlist": listings
     })

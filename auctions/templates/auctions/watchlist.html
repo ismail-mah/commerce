@@ -1,17 +1,22 @@
 {% extends "auctions/layout.html" %}
+{% load static %}
 
 {% block  title %}Watchlist{% endblock  %}
 
 {% block body %}
     <div class="container py-4">
-        <h2 class="mb-4 text-center">Watchlist Adam och ibrahim</h2>
+        <h2 class="mb-4 text-center">Watchlist</h2>
         <hr class="mb-3">
         {% if watchlist %}
             <div class="row">
                 {% for listing in watchlist %}
                     <div class="col-md-4 mb-4 d-flex">
-                        <div class="card w-100">
-                            <img src="{{ listing.image_url }}" class="card-img-top" alt="{{ listing.title }}">
+                        <div class="card w-100 position-relative">
+                            {% if listing.image_url %}
+                                <img src="{{ listing.image_url }}" class="card-img-top" alt="{{ listing.title }}">
+                            {% else %}
+                                <img src="{% static 'images/no-image.jpg' %}" class="card-img-top" alt="No images available">
+                            {% endif %}
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title ">{{ listing.title }}</h5>
                                 <p class="card-text">Current Price: ${{ listing.price }}</p>
@@ -24,7 +29,7 @@
                                     {% endif %}
                                 {% endif %}
                                 <div class="d-flex gap-2 mt-auto">
-                                    <a href="{% url 'listing' listing.id %}" class="btn btn-primary flex-fill text-center">View Listing</a>
+                                    <a href="{% url 'listing' listing.id %}" class="btn btn-primary flex-fill text-center stretched-link">View Listing</a>
                                     <a href="{% url 'remove_from_watchlist' listing.id %}" class="btn btn-danger flex-fill text-center">Remove from Watchlist</a>
                                 </div>
                             </div>

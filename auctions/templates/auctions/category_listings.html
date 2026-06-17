@@ -4,8 +4,18 @@
 
 {% block body %}
     <div class="container">
-        <h2 class="mb-4 text-center">{{ category.name }} Listings</h2>
+        <h2 class="mb-4 text-center">{{ category.name }} Category list</h2>
         <hr class="mb-4">
+        <div class="container d-flex justify-content-center align-items-center gap-2 mb-4">
+            <h6 class="mb-0">Select a category here:</h6>
+            <select class="form-select w-50" onchange="window.location=this.value">
+                <option selected disabled>Filter by category</option>
+                {% for cat in categories %}
+                    <option value="{% url 'category_listings' cat.id %}" {% if cat == category %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
         {% if listings %}
             <div class="row">
                 {% for listing in listings %}

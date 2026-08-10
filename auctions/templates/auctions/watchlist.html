@@ -19,7 +19,7 @@
                             {% endif %}
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title ">{{ listing.title }}</h5>
-                                <p class="card-text">Current Price: ${{ listing.price }}</p>
+                                <p class="card-text">Current Price: ${{ listing.current_price }}</p>
                                 <p class="text-muted"><i class="fas fa-clock"></i> {{ listing.created_at }}</p>
                                 {% if listing.end_time %}
                                     {% if listing.is_expired %}
@@ -30,7 +30,13 @@
                                 {% endif %}
                                 <div class="d-flex gap-2 mt-auto">
                                     <a href="{% url 'listing' listing.id %}" class="btn btn-primary flex-fill text-center">View Listing</a>
-                                    <a href="{% url 'remove_from_watchlist' listing.id %}" class="btn btn-danger flex-fill text-center">Remove from Watchlist</a>
+                                    <form action="{% url 'remove_from_watchlist' listing.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-danger">
+                                             <i class="bi bi-heart-fill"></i> Remove from Watchlist
+                                        </button>
+                                    </form>
+                                    {% comment %} <a href="{% url 'remove_from_watchlist' listing.id %}" class="btn btn-danger flex-fill text-center">Remove from Watchlist</a> {% endcomment %}
                                 </div>
                             </div>
                         </div>

@@ -6,6 +6,7 @@ from django.utils import timezone
 class User(AbstractUser):
     pass
 
+
 class Category(models.Model):
     name = models.CharField(max_length=64, unique=True)
 
@@ -37,3 +38,12 @@ class Listing(models.Model):
     def __str__(self):
         return f"{self.title} (ID: {self.id})"
 
+
+class Bid(models.Model):
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="bids")
+    bidder_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.bidder_user} bid ${self.amount} on {self.listing.title}"

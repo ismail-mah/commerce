@@ -1,26 +1,32 @@
 from django.contrib.auth import authenticate, login, logout
-from .models import User, Listing, Category
+from .models import User, Listing, Category, Bid
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import ListingForm, CategoryForm
 from django.urls import reverse
+from decimal import Decimal, InvalidOperation
 
 
 
-# Helper function to render error messages
+# Helper functions
 def render_error(request, message):
     return render(request, "auctions/error.html", {
         "message": message
     })
 
+def get_current_price(listing):
+    highest_bid = listing.bids.order_by('-amount').first()
+    return highest_bid.amount if highest_bid else listing.price
+
 def index(request):
-    activate_listings = Listing.objects.filter(active=True).order_by('-id')
+    active_listings = Listing.objects.filter(active=True).order_by('-id')
     return render(request, "auctions/index.html", {
-        "listings": activate_listings
+        "listings": active_listings
     })
+
 
 
 
@@ -32,7 +38,7 @@ def categories(request):
 
 
 def category_listings(request, category_id):
-    category = Category.objects.get(id=category_id)
+    category = get_object_or_404(Category, id=category_id)
     listings = Listing.objects.filter(category=category, active=True)
     return render(request, "auctions/category_listings.html", {
         "category": category,
@@ -40,25 +46,45 @@ def category_listings(request, category_id):
         "categories": Category.objects.all().order_by('name')
     })
 
+
+
+
 @login_required
 def create_category(request):
-    form = CategoryForm(request.POST or None)
-    if request.POST.get("name") and form.is_valid():
-        form.save()
-        messages.success(request, "Category created successfully.")
-        return redirect("categories")
+    if request.method == "POST":
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Category created successfully.")
+            return redirect("categories")
+        messages.error(request, "Error creating category. Please check the form for errors.")
+    else:
+        form = CategoryForm()
+
     return render(request, "auctions/create_category.html", {
         "form": form,
-        "title": "Create Category",
-        "error": "Please enter a category name."
+        "title": "Create Category"
     })
+
+
+def listing_context(request, single_listing):
+    highest_bid = single_listing.bids.order_by('-amount').first()
+    current_price = get_current_price(single_listing)
+    is_watching = False
+    if request.user.is_authenticated:
+        is_watching = single_listing.watcherlist.filter(pk=request.user.pk).exists()
+    return {
+        "listing": single_listing,
+        "highest_bid": highest_bid,
+        "current_price": current_price,
+        "is_watching": is_watching
+    }
+
 
 
 def listing(request, listing_id):
-    single_listing = Listing.objects.get(id=listing_id)
-    return render(request, "auctions/listing.html", {
-        "listing": single_listing
-    })
+    single_listing = get_object_or_404(Listing, pk=listing_id)
+    return render(request, "auctions/listing.html", listing_context(request, single_listing))
 
 
 
@@ -73,6 +99,7 @@ def create_listing(request):
             listing.save()
             messages.success(request, "Listing created successfully.")
             return redirect("listing", listing_id=listing.id)
+        messages.error(request, "Please correct the errors below.")
     else:
         form = ListingForm()
 
@@ -80,32 +107,75 @@ def create_listing(request):
         "form": form,
         "title": "Create Listing"
     })
-        
+
+
 
 @login_required
 def watchlist(request):
     listings = request.user.watched_listings.all().order_by('-id')
+    for listing in listings:
+        listing.current_price = get_current_price(listing)
     return render(request, "auctions/watchlist.html", {
-        "watchlist": listings
+        "watchlist": listings,
     })
 
 @login_required
 def add_to_watchlist(request, listing_id):
-    listing = Listing.objects.get(id=listing_id)
-    if listing.watcherlist.filter(id=request.user.id).exists():
+    if request.method != "POST":
+        return redirect("listing", listing_id=listing_id)
+    listing = get_object_or_404(Listing, pk=listing_id)
+    if listing.watcherlist.filter(pk=request.user.pk).exists():
         messages.info(request, "Listing is already in your watchlist.")
     else:
         listing.watcherlist.add(request.user)
         messages.success(request, "Listing added to watchlist.")
-    return redirect("watchlist")
+    return redirect("listing", listing_id=listing_id)
 
 
-
+@login_required
 def remove_from_watchlist(request, listing_id):
-    listing = Listing.objects.get(id=listing_id)
-    listing.watcherlist.remove(request.user)
-    messages.success(request, "Listing removed from watchlist.")
-    return redirect("watchlist")
+    if request.method != "POST":
+        return redirect("listing", listing_id=listing_id)
+    listing = get_object_or_404(Listing, pk=listing_id)
+    if listing.watcherlist.remove(request.user):
+        messages.success(request, "Listing removed from watchlist.")
+    else:
+        messages.info(request, "Listing is not in your watchlist.")
+    return redirect("listing", listing_id=listing_id)
+
+
+@login_required
+def add_to_bid(request, listing_id):
+    listing = get_object_or_404(Listing, pk=listing_id)
+
+    if request.method != "POST":
+        return redirect("listing", listing_id=listing_id)
+
+    initial_amount = request.POST.get("bid_amount", "")
+    context = listing_context(request, listing)
+    context["bid_amount"] = initial_amount
+
+    if request.user == listing.owner:
+        context["bid_error"] = "You cannot bid on your own listing."
+        return render(request, "auctions/listing.html", context)
+    try:
+        bid_amount = Decimal(initial_amount)
+    except (ValueError, InvalidOperation, TypeError):
+        context["bid_error"] = "Enter a valid number for the bid."
+        return render(request, "auctions/listing.html", context)
+
+    if bid_amount <= context["current_price"]:
+        context["bid_error"] = f"Bid must be higher than the current price of ${context['current_price']}."
+        return render(request, "auctions/listing.html", context)
+
+    Bid.objects.create(
+        listing=listing,
+        
+        bidder_user=request.user,
+        amount=bid_amount
+    )
+    messages.success(request, "Bid placed successfully.")
+    return redirect("listing", listing_id=listing_id)
 
     
 

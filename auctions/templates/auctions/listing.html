@@ -35,35 +35,35 @@
                         <p><strong>Listed by:</strong> <span class="username">{{ listing.owner.username }}</span></p>
                     </div>
 
-                    <!-- Close Auction Modal -->
-                    {% include "auctions/close_auction.html" %}
                     
                     <div class="d-flex flex-wrap gap-2 mt-3">
                         {% if user.is_authenticated %}
-                            {% if is_watching %}
-                                <form action="{% url 'remove_from_watchlist' listing.id %}" method="post">
-                                    {% csrf_token %}
+                        {% if is_watching %}
+                        <form action="{% url 'remove_from_watchlist' listing.id %}" method="post">
+                            {% csrf_token %}
                                     <button type="submit" class="btn btn-outline-danger">
                                         <i class="bi bi-heart-fill"></i> Remove from Watchlist
                                     </button>
                                 </form>
                             {% else %}
-                                <form action="{% url 'add_to_watchlist' listing.id %}" method="post">
-                                    {% csrf_token %}
+                            <form action="{% url 'add_to_watchlist' listing.id %}" method="post">
+                                {% csrf_token %}
                                     <button type="submit" class="btn btn-outline-secondary">
                                         <i class="bi bi-heart"></i> Add to Watchlist
                                     </button>
                                 </form>
-                            {% endif %}
-                        
-                            <!-- Button trigger modal -->
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bidModal">
-                                <i class="bi bi-hammer"></i> Place Bid
-                            </button>
-                            {% else %}
-                            <p class="text-muted mb-0">Please <a href="{% url 'login' %}">log in</a> to add to watchlist or place a bid.</p>
-                            
-                        {% endif %}
+                                {% endif %}
+                                
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bidModal">
+                                    <i class="bi bi-hammer"></i> Place Bid
+                                </button>
+                                {% else %}
+                                <p class="text-muted mb-0">Please <a href="{% url 'login' %}">log in</a> to add to watchlist or place a bid.</p>
+                                
+                                {% endif %}
+                                <!-- Close Auction button Modal -->
+                                {% include "auctions/close_auction.html" %}
                         
                     </div>
 

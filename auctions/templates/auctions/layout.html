@@ -40,7 +40,7 @@
                             </a>
                         </li>
 
-                        {% if user.is_authenticated %}
+                        {% if user.is_authenticated and request.user.watched_listings.count %}
                             <li class="nav-item">
                                 <a class="nav-link mx-2 {% if request.resolver_match.url_name == 'watchlist' %}active{% endif %}" 
                                     href="{% url 'watchlist' %}">Watchlist

@@ -24,7 +24,9 @@
                                         <i class="bi bi-tag-fill"></i>
                                     </div>
                                     <h6 class="fw-semibold mb-2">{{ category.name }}</h6>
-                                    <span class="badge bg-secondary">{{ category.listings.count }}</span>
+                                    {% if category.listings.count > 0 %}
+                                        <span class="badge bg-secondary">{{ category.listings.count }}</span>
+                                    {% endif %}
                                     <a class="stretched-link" href="{% url 'category_listings' category.id %}"></a>
                 
                                 </div>

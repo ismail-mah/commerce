@@ -24,6 +24,9 @@
                             <img src="{{ listing.image_url }}" class="card-img-top" alt="{{ listing.title }}">
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">{{ listing.title }}</h5>
+                                {% if not listing.active %}
+                                    <span class="badge bg-danger">Listing is closed.</span>
+                                {% endif %}
                                 <p class="card-text">Price: ${{ listing.price }}</p>
                                 <p class="text-muted"><i class="fas fa-clock"></i> {{ listing.created_at }}</p>
                                 {% if listing.end_time %}

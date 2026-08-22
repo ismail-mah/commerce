@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import widgets
-from .models import Listing, Category
+from .models import Listing, Category, Comment
 
 
 class CategoryForm(forms.ModelForm):
@@ -31,4 +31,19 @@ class ListingForm(forms.ModelForm):
             'image_url': forms.URLInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-select'}),
             'end_time': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+        }
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['comment_text']
+        widgets = {
+            'comment_text': forms.Textarea(attrs={
+                'class': 'form-control', 
+                'rows': 3,
+                'placeholder': 'Write a comment...'
+            }),
+        }
+        labels = {
+            'comment_text': '',
         }

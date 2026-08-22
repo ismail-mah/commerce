@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import ListingForm, CategoryForm
+from .forms import ListingForm, CategoryForm, CommentForm
 from django.urls import reverse
 from decimal import Decimal, InvalidOperation
 
@@ -22,9 +22,11 @@ def get_current_price(listing):
     return highest_bid.amount if highest_bid else listing.price
 
 def index(request):
-    active_listings = Listing.objects.filter(active=True).order_by('-id')
+    listings = Listing.objects.all().order_by('-id')
+    for listing in listings:
+        listing.current_price = get_current_price(listing)
     return render(request, "auctions/index.html", {
-        "listings": active_listings
+        "listings": listings
     })
 
 
@@ -39,7 +41,7 @@ def categories(request):
 
 def category_listings(request, category_id):
     category = get_object_or_404(Category, id=category_id)
-    listings = Listing.objects.filter(category=category, active=True)
+    listings = Listing.objects.filter(category=category).order_by('-id')
     return render(request, "auctions/category_listings.html", {
         "category": category,
         "listings": listings,
@@ -67,7 +69,7 @@ def create_category(request):
     })
 
 
-def listing_context(request, single_listing):
+def listing_context(request, single_listing, comment_form=None):
     highest_bid = single_listing.bids.order_by('-amount').first()
     current_price = get_current_price(single_listing)
     is_watching = False
@@ -77,13 +79,18 @@ def listing_context(request, single_listing):
         "listing": single_listing,
         "highest_bid": highest_bid,
         "current_price": current_price,
-        "is_watching": is_watching
+        "is_watching": is_watching,
+        "comment_form": comment_form or CommentForm(),
+        "comments": single_listing.comments.order_by('-id'),
     }
 
 
 
 def listing(request, listing_id):
-    single_listing = get_object_or_404(Listing, pk=listing_id)
+    try:
+        single_listing = Listing.objects.get(pk=listing_id)
+    except Listing.DoesNotExist:
+        return render_error(request, "Listing not found.")
     return render(request, "auctions/listing.html", listing_context(request, single_listing))
 
 
@@ -137,7 +144,9 @@ def remove_from_watchlist(request, listing_id):
     if request.method != "POST":
         return redirect("listing", listing_id=listing_id)
     listing = get_object_or_404(Listing, pk=listing_id)
-    if listing.watcherlist.remove(request.user):
+
+    if listing.watcherlist.filter(pk=request.user.pk).exists():
+        listing.watcherlist.remove(request.user)
         messages.success(request, "Listing removed from watchlist.")
     else:
         messages.info(request, "Listing is not in your watchlist.")
@@ -177,7 +186,46 @@ def add_to_bid(request, listing_id):
     messages.success(request, "Bid placed successfully.")
     return redirect("listing", listing_id=listing_id)
 
-    
+
+
+@login_required
+def add_comment(request, listing_id):
+    listing = get_object_or_404(Listing, pk=listing_id)
+
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.listing = listing
+            comment.commenter_user = request.user
+            comment.save()
+            messages.success(request, "Comment added successfully.")
+            return redirect("listing", listing_id=listing_id)
+        else:
+            messages.error(request, "Please correct the errors below.")
+            context = listing_context(request, listing, comment_form=form)
+            return render(request, "auctions/listing.html", context)
+    return redirect("listing", listing_id=listing_id)
+
+
+@login_required
+def close_listing_auction(request, listing_id):
+    if request.method == "POST":
+        listing = get_object_or_404(Listing, pk=listing_id)
+        if request.user != listing.owner:
+            messages.error(request, "The auction can only be closed by the owner.")
+            return redirect("listing", listing_id=listing_id)
+
+        highest_bid = listing.bids.order_by('-amount').first()
+        if highest_bid:
+            listing.winner = highest_bid.bidder_user
+        listing.active = False
+        listing.save()
+        messages.success(request, "The auction has been closed successfully.")
+        return redirect("listing", listing_id=listing_id)
+    return redirect("listing", listing_id=listing_id)
+        
+
 
 def login_view(request):
     if request.method == "POST":

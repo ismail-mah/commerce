@@ -1,0 +1,59 @@
+
+<div class="mt-5">
+    <div class="d-flex align-items-center gap-2 mb-3">
+        <h5 class="mb-0 fw-semibold">Comments</h5>
+        {% if comments %}
+            <span class="badge bg-secondary rounded-pill fw-normal">{{ comments|length }}</span>
+        {% endif %}
+    </div>
+
+
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <form action="{% url 'add_comment' listing.id %}" method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ comment_form.comment_text.label_tag }}
+                    {{ comment_form.comment_text }}
+                    {% if comment_form.comment_text.errors %}
+                        <div class="text-danger mt-1 small">
+                            {{ comment_form.comment_text.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-primary btn-sm px-4" type="submit">
+                        <i class="bi bi-send me-1"></i>
+                        Post Comment
+                    </button>
+                </div>
+            </form>
+
+            {% comment %} Display existing comments {% endcomment %}
+            <div class="mt-4">
+                {% for comment in comments %}
+                    <div class="comment-item d-flex gap-3 py-3 border-bottom">
+                        <div class="comment-user-avatar">
+                            {{ comment.commenter_user.username|first}}
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-semibold comment-user-span">{{ comment.commenter_user.username }}</span>
+                                <span class="text-muted comment-date">{{ comment.created_at|date:"M d, Y · g:i A"}}</span>
+                            </div>
+                            <p class="mb-0 text-body comment-text-body">{{ comment.comment_text }}</p>
+                        </div>
+                    </div>
+
+                {% empty %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-chat-dots text-muted chat-icon"></i>
+                        <p class=" text-muted mt-2 mb-0 small">No comments yet. Be the first to comment!</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

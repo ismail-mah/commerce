@@ -1,60 +1,42 @@
-<!-- Displays when auction is closed -->
-{% if not listing.active %}
-    <div class="alert alert-primary text-center my-3" role="alert">
-        <h4 class="alert-heading">Auction is Closed</h4>
-
-        {% if highest_bid %}
-            {% if user == highest_bid.bidder_user %}
-                <p class="fw-bold text-success mb-2">
-                    Congratulations! You won the auction with a bid of ${{ highest_bid.amount }}.
-                </p>
-            {% else %}
-                <p class="mt-2">
-                    Won by <strong>{{ highest_bid.bidder_user.username }}</strong> 
-                    with a bid of ${{ highest_bid.amount }}.
-                </p>
-            {% endif %}
-        {% else %}
-            <p class="mt-2">No bids were placed and the auction is closed..</p>
-        {% endif %}
-    </div>
-{% endif %}
-
 
 <!-- Close Auction Button -->
 {% if user.is_authenticated and user == listing.owner and listing.active %}
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#closeAuctionModal">
+    <button type="button"
+            class="btn btn-outline-danger"
+            data-bs-toggle="modal"
+            data-bs-target="#closeAuctionModal">
         <i class="bi bi-x-circle"></i> Close Auction
     </button>
-
-<!-- Close Auction Modal only for owner -->
-
-    <div class="modal fade" id="closeAuctionModal" tabindex="-1" aria-labelledby="closeAuctionModalLabel" aria-hidden="true">
+    <!-- Close Auction Modal only for owner -->
+    <div class="modal fade"
+         id="closeAuctionModal"
+         tabindex="-1"
+         aria-labelledby="closeAuctionModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-danger">
                 <div class="modal-header bg-danger text-white">
                     <h1 class="modal-title fs-5" id="closeAuctionModalLabel">Confirm Auction Closure</h1>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                 </div>
-
                 <form action="{% url 'close_listing_auction' listing.id %}" method="post">
                     {% csrf_token %}
-
                     <div class="modal-body">
                         <p class="mb-2">Are you sure you want to close the auction for?</p>
-                        
                         {% if highest_bid %}
-                        <div class="alert alert-success py-2">
-                            <p>Title: <span class="fw-semibold">{{ listing.title }}</span></p>
-                            <p>Highest Bid: <span class="fw-semibold">${{ highest_bid.amount }}</span></p>
-                            <p>High bidder: <span class="fw-semibold">{{ highest_bid.bidder_user.username }}</span></p>
-                        </div>
+                            <div class="alert alert-success py-2">
+                                <p>Title: <span class="fw-semibold">{{ listing.title }}</span></p>
+                                <p>Highest Bid: <span class="fw-semibold">${{ highest_bid.amount }}</span></p>
+                                <p>High bidder: <span class="fw-semibold">{{ highest_bid.bidder_user.username }}</span></p>
+                            </div>
                         {% else %}
                             <div class="alert alert-warning py-2">
                                 <p>No bids have been placed yet.</p>
                             </div>
                         {% endif %}
-                        
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

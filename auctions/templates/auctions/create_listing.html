@@ -1,62 +1,64 @@
 {% extends "auctions/layout.html" %}
-
-{% block title %}Create Listing{% endblock  %}
-
+{% block title %}{{ title }}{% endblock %}
 {% block body %}
-
-
-<h4 class="text-center my-4">{{ title }}</h4>
-
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-9 col-sm-12 mx-auto">
-
-            <div class="card shadow-sm">
-
-                {% comment %} <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Create a New Listing</h4>
-                </div> {% endcomment %}
-
-                <div class="card-body">
-                    
-                    <form action="{% url 'create_listing' %}" method="post" class="shadow p-4 rounded">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            {{ form.title.label_tag }}
-                            {{ form.title }}
-                            {{ form.title.errors }}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.description.label_tag }}
-                            {{ form.description }}
-                            {{ form.description.errors }}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.price.label_tag }}
-                            {{ form.price }}
-                            {{ form.price.errors }}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.image_url.label_tag }}
-                            {{ form.image_url }}
-                            {{ form.image_url.errors }}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.category.label_tag }}
-                            {{ form.category }}
-                            {{ form.category.errors }}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.end_time.label_tag }}
-                            {{ form.end_time }}
-                            {{ form.end_time.errors }}
-                        </div>
-                        <input class="btn btn-primary" type="submit" value="Create Listing">
-                    </form>
+    <div class="container py-5">
+        <div class="text-center mb-2">
+            <h2 class="fw-semibold mb-0">{{ title }}</h2>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8 col-xl-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4 p-md-5">
+                        <form action="{% url 'create_listing' %}" method="post">
+                            {% csrf_token %}
+                            <div>
+                                <h5 class="fw-semibold mb-1">Item Details</h5>
+                                <p class="text-body-secondary small mb-4">Provide the neccessary information about the item.</p>
+                                <div class="mb-3">
+                                    {{ form.title.label_tag }}
+                                    {{ form.title }}
+                                    {{ form.title.errors }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.description.label_tag }}
+                                    {{ form.description }}
+                                    {{ form.description.errors }}
+                                </div>
+                                <div class="mb-3">
+                                    {{ form.image_url.label_tag }}
+                                    {{ form.image_url }}
+                                    {{ form.image_url.errors }}
+                                </div>
+                            </div>
+                            <hr class="my-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    {{ form.price.label_tag }}
+                                    {{ form.price }}
+                                    {{ form.price.errors }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.category.label_tag }}
+                                    {{ form.category }}
+                                    {{ form.category.errors }}
+                                </div>
+                            </div>
+                            <hr class="my-4">
+                            <div class="mb-4">
+                                {{ form.end_time.label_tag }}
+                                {{ form.end_time }}
+                                {{ form.end_time.errors }}
+                            </div>
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{% url 'index' %}" class="btn btn-outline-danger px-4"><i class="bi bi-x-circle-fill"></i> Cancel</a>
+                                <button class="btn btn-primary px-4" type="submit">
+                                    <i class="bi bi-plus-circle"></i> Create Listing
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
 {% endblock %}

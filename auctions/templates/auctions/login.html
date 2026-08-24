@@ -1,7 +1,5 @@
 {% extends "auctions/layout.html" %}
-
 {% block body %}
-
     <div class="container mt-4 py-4 login-container">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white border-bottom py-3">
@@ -11,14 +9,20 @@
                 {% if message %}
                     <div class="alert alert-danger">{{ message }}</div>
                 {% endif %}
-
                 <form action="{% url 'login' %}" method="post">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <input autofocus class="form-control" type="text" name="username" placeholder="Username">
+                        <input autofocus
+                               class="form-control"
+                               type="text"
+                               name="username"
+                               placeholder="Username">
                     </div>
                     <div class="mb-3">
-                        <input class="form-control" type="password" name="password" placeholder="Password">
+                        <input class="form-control"
+                               type="password"
+                               name="password"
+                               placeholder="Password">
                     </div>
                     <input class="btn btn-primary w-100" type="submit" value="Log In">
                 </form>
@@ -28,5 +32,4 @@
             </div>
         </div>
     </div>
-
 {% endblock %}

@@ -11,18 +11,28 @@ from decimal import Decimal, InvalidOperation
 
 
 
-# Helper functions
+# Helper function to render an error page with a given message
 def render_error(request, message):
     return render(request, "auctions/error.html", {
         "message": message
     })
 
+# Helper function to get the current price of a listing
 def get_current_price(listing):
     highest_bid = listing.bids.order_by('-amount').first()
     return highest_bid.amount if highest_bid else listing.price
 
+# View functions for all the auctions listings
 def index(request):
-    listings = Listing.objects.all().order_by('-id')
+    listings = Listing.objects.filter(active=True).order_by('-id')
+    for listing in listings:
+        listing.current_price = get_current_price(listing)
+    return render(request, "auctions/index.html", {
+        "listings": listings
+    })
+
+def closed_listings(request):
+    listings = Listing.objects.filter(active=False).order_by('-id')
     for listing in listings:
         listing.current_price = get_current_price(listing)
     return render(request, "auctions/index.html", {
@@ -112,7 +122,7 @@ def create_listing(request):
 
     return render(request, "auctions/create_listing.html", {
         "form": form,
-        "title": "Create Listing"
+        "title": "Create a new Listing"
     })
 
 

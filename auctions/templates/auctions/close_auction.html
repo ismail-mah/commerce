@@ -30,7 +30,7 @@
                             <div class="alert alert-success py-2">
                                 <p>Title: <span class="fw-semibold">{{ listing.title }}</span></p>
                                 <p>Highest Bid: <span class="fw-semibold">${{ highest_bid.amount }}</span></p>
-                                <p>High bidder: <span class="fw-semibold">{{ highest_bid.bidder_user.username }}</span></p>
+                                <p>Highest bidder: <span class="fw-semibold">{{ highest_bid.bidder_user.username | capfirst }}</span></p>
                             </div>
                         {% else %}
                             <div class="alert alert-warning py-2">

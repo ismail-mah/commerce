@@ -1,13 +1,12 @@
 {% extends "auctions/layout.html" %}
-
 {% block title %}Categories{% endblock %}
-
-{% block  body %}
+{% block body %}
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="mb-0">Categories</h2>
             {% if user.is_authenticated %}
-                <a href="{% url 'create_category' %}" class="btn btn-sm btn-outline-primary">
+                <a href="{% url 'create_category' %}"
+                   class="btn btn-sm btn-outline-primary">
                     <i class="bi bi-plus-lg"></i> Add New Category
                 </a>
             {% endif %}
@@ -24,21 +23,19 @@
                                         <i class="bi bi-tag-fill"></i>
                                     </div>
                                     <h6 class="fw-semibold mb-2">{{ category.name }}</h6>
-                                    {% if category.listings.count > 0 %}
-                                        <span class="badge bg-secondary">{{ category.listings.count }}</span>
+                                    {% if category.active_listing_count > 0 %}
+                                        <span class="badge bg-secondary">{{ category.active_listing_count }}</span>
                                     {% endif %}
-                                    <a class="stretched-link" href="{% url 'category_listings' category.id %}"></a>
-                
+                                    <a class="stretched-link"
+                                       href="{% url 'category_listings' category.id %}"></a>
                                 </div>
-    
                             </div>
                         </div>
                     {% endfor %}
-    
                 </div>
             </div>
         {% else %}
             <p>No categories available.</p>
         {% endif %}
     </div>
-{% endblock  %}
+{% endblock %}

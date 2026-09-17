@@ -34,8 +34,11 @@
                             {% if not list.active %}
                                 <span class="badge bg-danger">Listing is closed.</span>
                             {% endif %}
-                            <!-- <p class="card-text">{{ list.description }}</p> -->
-                            <p class="card-text">Price: ${{ list.current_price }}</p>
+                            <p class="card-text">{{ list.description|truncatewords:15 }}</p>
+                            <p class="card-text">
+                                <i class="bi bi-cash-stack"></i>
+                                Current price: ${{ list.current_price }}
+                            </p>
                             <p class="text-muted"><i class="bi bi-calendar-plus"></i> {{ list.created_at }}</p>
                             {% if list.end_time %}
                                 {% if list.is_expired %}

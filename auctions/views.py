@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from .models import User, Listing, Category, Bid
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -16,6 +16,12 @@ def render_error(request, message):
     return render(request, "auctions/error.html", {
         "message": message
     })
+
+# Helper function when a page does not exist, while on production with DEBUG=False
+def page_not_found(request, exception):
+    return render(request, "auctions/error.html", {
+        "message": "The page does not exist."
+    }, status=404,)
 
 # Helper function to get the current price of a listing
 def get_current_price(listing):
@@ -44,14 +50,19 @@ def closed_listings(request):
 
 def categories(request):
     categories = Category.objects.all().order_by('name')
+    for category in categories:
+        category.active_listing_count = category.listings.filter(active=True).count()
     return render(request, "auctions/categories.html", {
         "categories": categories
     })
 
 
 def category_listings(request, category_id):
-    category = get_object_or_404(Category, id=category_id)
-    listings = Listing.objects.filter(category=category).order_by('-id')
+    try:
+        category = Category.objects.get(pk=category_id)
+    except Category.DoesNotExist:
+        return render_error(request, "Category not found.")
+    listings = Listing.objects.filter(category=category, active=True).order_by('-id')
     return render(request, "auctions/category_listings.html", {
         "category": category,
         "listings": listings,
@@ -82,6 +93,10 @@ def create_category(request):
 def listing_context(request, single_listing, comment_form=None):
     highest_bid = single_listing.bids.order_by('-amount').first()
     current_price = get_current_price(single_listing)
+    user_bid = None
+    if request.user.is_authenticated:
+        user_bid = single_listing.bids.filter(bidder_user=request.user).order_by('-amount').first()
+        
     is_watching = False
     if request.user.is_authenticated:
         is_watching = single_listing.watcherlist.filter(pk=request.user.pk).exists()
@@ -92,6 +107,7 @@ def listing_context(request, single_listing, comment_form=None):
         "is_watching": is_watching,
         "comment_form": comment_form or CommentForm(),
         "comments": single_listing.comments.order_by('-id'),
+        "user_bid": user_bid,
     }
 
 
@@ -170,6 +186,10 @@ def add_to_bid(request, listing_id):
     if request.method != "POST":
         return redirect("listing", listing_id=listing_id)
 
+    if not listing.active:
+        messages.error(request, "This auction is closed.")
+        return redirect("listing", listing_id=listing_id)
+    
     initial_amount = request.POST.get("bid_amount", "")
     context = listing_context(request, listing)
     context["bid_amount"] = initial_amount
@@ -183,8 +203,15 @@ def add_to_bid(request, listing_id):
         context["bid_error"] = "Enter a valid number for the bid."
         return render(request, "auctions/listing.html", context)
 
-    if bid_amount <= context["current_price"]:
-        context["bid_error"] = f"Bid must be higher than the current price of ${context['current_price']}."
+    listing_has_bids = listing.bids.exists()
+    current_price = context["current_price"]
+
+    if listing_has_bids and bid_amount <= current_price:
+        context["bid_error"] = (f"Bid must be higher than the current price of ${current_price}.")
+        return render(request, "auctions/listing.html", context)
+
+    if not listing_has_bids and bid_amount < listing.price:
+        context["bid_error"] = (f"Your first bid must be at least the starting price of ${listing.price}.")
         return render(request, "auctions/listing.html", context)
 
     Bid.objects.create(

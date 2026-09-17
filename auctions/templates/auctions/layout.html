@@ -47,7 +47,7 @@
                             <ul class="dropdown-menu" aria-labelledby="listingDropdown">
                                 <li>
                                     <a href="{% url 'closed_listings' %}"
-                                       class="dropdown-item  {% if request.resolver_match.url_name == 'closed_listings' %}active{% endif %}">
+                                       class="dropdown-item {% if request.resolver_match.url_name == 'closed_listings' %}active{% endif %}">
                                         <i class="bi bi-lock"></i> Closed Listings
                                     </a>
                                 </li>
@@ -65,10 +65,13 @@
                                 </a>
                             </li>
                         {% endif %}
-                        <li class="nav-item">
-                            <a class="nav-link mx-2 {% if request.resolver_match.url_name == 'create_listing' %}active{% endif %}"
-                               href="{% url 'create_listing' %}"><i class="bi bi-plus-circle"></i> Create Listing</a>
-                        </li>
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link mx-2 {% if request.resolver_match.url_name == 'create_listing' %}active{% endif %}"
+                                href="{% url 'create_listing' %}"><i class="bi bi-plus-circle"></i> Create Listing</a>
+                            </li>
+
+                        {% endif %}
                     </ul>
                     <ul class="navbar-nav end-0 mb-2 mb-lg-0">
                         {% if user.is_authenticated %}

@@ -1,8 +1,6 @@
 {% extends "auctions/layout.html" %}
 {% load static %}
-
-{% block  title %}Watchlist{% endblock  %}
-
+{% block title %}Watchlist{% endblock %}
 {% block body %}
     <div class="container py-4">
         <h2 class="mb-4 text-center">Watchlist</h2>
@@ -13,39 +11,43 @@
                     <div class="col-md-4 mb-4 d-flex">
                         <div class="card w-100 position-relative">
                             {% if listing.image_url %}
-                                <img src="{{ listing.image_url }}" class="card-img-top" alt="{{ listing.title }}">
+                                <img src="{{ listing.image_url }}"
+                                     class="card-img-top"
+                                     alt="{{ listing.title }}">
                             {% else %}
-                                <img src="{% static 'images/no-image.jpg' %}" class="card-img-top" alt="No images available">
+                                <img src="{% static 'images/no-image.jpg' %}"
+                                     class="card-img-top"
+                                     alt="No images available">
                             {% endif %}
                             <div class="card-body d-flex flex-column">
-                                <h5 class="card-title ">{{ listing.title }}</h5>
-                                <p class="card-text">Current Price: ${{ listing.current_price }}</p>
-                                <p class="text-muted"><i class="fas fa-clock"></i> {{ listing.created_at }}</p>
-                                {% if listing.end_time %}
-                                    {% if listing.is_expired %}
-                                        <p class="text-muted"><i class="fa fa-hourglass-end"></i> Ended at: {{ listing.end_time }}</p>
-                                    {% else %}
-                                        <p class="text-muted"><i class="fa fa-hourglass-end"></i> Ends at: {{ listing.end_time }}</p>
-                                    {% endif %}
-                                {% endif %}
+                                <h5 class="card-title">{{ listing.title }}</h5>
+                                <p class="card-text">
+                                    <i class="bi bi-cash-stack"></i>
+                                    Current Price: ${{ listing.current_price }}
+                                </p>
+                                <p class="text-muted"><i class="bi bi-calendar-plus"></i> {{ listing.created_at|timesince }} ago</p>
                                 <div class="d-flex gap-2 mt-auto">
-                                    <a href="{% url 'listing' listing.id %}" class="btn btn-primary flex-fill text-center">View Listing</a>
+                                    <a href="{% url 'listing' listing.id %}"
+                                       class="btn btn-primary flex-fill text-center">View Listing</a>
                                     <form action="{% url 'remove_from_watchlist' listing.id %}" method="post">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-outline-danger">
-                                             <i class="bi bi-heart-fill"></i> Remove from Watchlist
+                                            <i class="bi bi-heart-fill"></i> Remove from Watchlist
                                         </button>
                                     </form>
-                                    {% comment %} <a href="{% url 'remove_from_watchlist' listing.id %}" class="btn btn-danger flex-fill text-center">Remove from Watchlist</a> {% endcomment %}
                                 </div>
                             </div>
                         </div>
                     </div>
                 {% endfor %}
             </div>
-
-            {% else %}
-            <p class="text-muted text-center">You have no items in your watchlist.</p>
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-light text-center py-4">
+                    <i class="bi bi-heart fs-3"></i>
+                    <p class="mb-0 mt-2">You have no items in your watchlist.</p>
+                </div>
+            </div>
         {% endif %}
     </div>
 {% endblock %}

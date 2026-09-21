@@ -11,24 +11,24 @@ from decimal import Decimal, InvalidOperation
 
 
 
-# Helper function to render an error page with a given message
+#Error handle across the project
 def render_error(request, message):
     return render(request, "auctions/error.html", {
         "message": message
     })
 
-# Helper function when a page does not exist, while on production with DEBUG=False
+# When a page does not exist, while on production with DEBUG=False
 def page_not_found(request, exception):
     return render(request, "auctions/error.html", {
         "message": "The page does not exist."
     }, status=404,)
 
-# Helper function to get the current price of a listing
+# Get the current price of a listing
 def get_current_price(listing):
     highest_bid = listing.bids.order_by('-amount').first()
     return highest_bid.amount if highest_bid else listing.price
 
-# View functions for all the auctions listings
+# Get all the auctions listings
 def index(request):
     listings = Listing.objects.filter(active=True).order_by('-id')
     for listing in listings:
@@ -63,6 +63,8 @@ def category_listings(request, category_id):
     except Category.DoesNotExist:
         return render_error(request, "Category not found.")
     listings = Listing.objects.filter(category=category, active=True).order_by('-id')
+    for listing in listings:
+        listing.current_price = get_current_price(listing)
     return render(request, "auctions/category_listings.html", {
         "category": category,
         "listings": listings,
@@ -154,9 +156,13 @@ def watchlist(request):
 
 @login_required
 def add_to_watchlist(request, listing_id):
+    try:
+        listing = Listing.objects.get(pk=listing_id)
+    except Listing.DoesNotExist:
+        return render_error(request, "Lising does not exist.")
+
     if request.method != "POST":
         return redirect("listing", listing_id=listing_id)
-    listing = get_object_or_404(Listing, pk=listing_id)
     if listing.watcherlist.filter(pk=request.user.pk).exists():
         messages.info(request, "Listing is already in your watchlist.")
     else:
@@ -167,9 +173,13 @@ def add_to_watchlist(request, listing_id):
 
 @login_required
 def remove_from_watchlist(request, listing_id):
+    try:
+        listing = Listing.objects.get(pk=listing_id)
+    except Listing.DoesNotExist:
+        return render_error(request, "Listing does not exist.")
+
     if request.method != "POST":
         return redirect("listing", listing_id=listing_id)
-    listing = get_object_or_404(Listing, pk=listing_id)
 
     if listing.watcherlist.filter(pk=request.user.pk).exists():
         listing.watcherlist.remove(request.user)
@@ -181,7 +191,11 @@ def remove_from_watchlist(request, listing_id):
 
 @login_required
 def add_to_bid(request, listing_id):
-    listing = get_object_or_404(Listing, pk=listing_id)
+    try:
+        listing = Listing.objects.get(pk=listing_id)
+    except Listing.DoesNotExist:
+        return render_error(request, "Listing not found.")
+    
 
     if request.method != "POST":
         return redirect("listing", listing_id=listing_id)
@@ -227,7 +241,10 @@ def add_to_bid(request, listing_id):
 
 @login_required
 def add_comment(request, listing_id):
-    listing = get_object_or_404(Listing, pk=listing_id)
+    try:
+        listing = Listing.objects.get(pk=listing_id)
+    except Listing.DoesNotExist:
+        return render_error(request, "Listing does not exist.")
 
     if request.method == "POST":
         form = CommentForm(request.POST)
@@ -247,19 +264,22 @@ def add_comment(request, listing_id):
 
 @login_required
 def close_listing_auction(request, listing_id):
-    if request.method == "POST":
-        listing = get_object_or_404(Listing, pk=listing_id)
-        if request.user != listing.owner:
-            messages.error(request, "The auction can only be closed by the owner.")
-            return redirect("listing", listing_id=listing_id)
-
-        highest_bid = listing.bids.order_by('-amount').first()
-        if highest_bid:
-            listing.winner = highest_bid.bidder_user
-        listing.active = False
-        listing.save()
-        messages.success(request, "The auction has been closed successfully.")
+    listing = Listing.objects.get(pk=listing_id)
+    if request.method != "POST":
         return redirect("listing", listing_id=listing_id)
+    if not listing.active:
+        return redirect("listing", listing_id=listing_id)
+    if request.user != listing.owner:
+        messages.error(request, "The auction can only be closed by the owner.")
+        return redirect("listing", listing_id=listing_id)
+
+    highest_bid = listing.bids.order_by('-amount').first()
+    if highest_bid:
+        listing.winner = highest_bid.bidder_user
+    listing.active = False
+    listing.save()
+
+    messages.success(request, "The auction has been closed successfully.")
     return redirect("listing", listing_id=listing_id)
         
 

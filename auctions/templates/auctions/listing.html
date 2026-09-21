@@ -45,24 +45,14 @@
                         {% endif %}
                         <p>
                             <i class="bi bi-clock"></i>
-                            <strong>Created at:</strong> {{ listing.created_at }}
+                            <strong>Created on:</strong> {{ listing.created_at }}
                         </p>
-                        {% if listing.end_time %}
-                            {% if listing.is_expired %}
-                                <p class="mb-0">
-                                    <i class="bi bi-hourglass-bottom"></i>
-                                    <strong>Ended at:</strong> <span class="text-danger">{{ listing.end_time }}</span>
-                                </p>
-                            {% else %}
-                                <p class="text-muted mb-0"><i class="fa fa-hourglass-half"></i><strong> Ends at:</strong> {{ listing.end_time }}</p>
-                            {% endif %}
-                        {% endif %}
                         <p>
                             <i class="bi bi-person-lines-fill"></i>
                             <strong>Listed by:</strong> <span class="username">{{ listing.owner.username }}</span>
                         </p>
                     </div>
-                    <!-- Displays when auction is closed -->
+                    <!-- Show auction closed only when listing is not active-->
                     {% if not listing.active %}
                         <div class="alert alert-primary text-center my-3" role="alert">
                             <h4 class="alert-heading">Auction is Closed</h4>
@@ -80,7 +70,7 @@
                             {% endif %}
                         </div>
                     {% endif %}
-                    <!-- Watchlist and Bid Buttons -->
+                    <!-- Show Watchlist and Bid Buttons only for authenticated users -->
                     <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
                         {% if user.is_authenticated %}
                             {% if is_watching %}
@@ -98,22 +88,24 @@
                                     </button>
                                 </form>
                             {% endif %}
-                            <!-- Button trigger modal -->
-                            <button type="button"
-                                    class="btn btn-primary"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#bidModal">
-                                <i class="bi bi-hammer"></i> Place Bid
-                            </button>
+                            <!-- Trigger bid  modal -->
+                             {% if listing.active and listing.owner != user %}
+                                <button type="button"
+                                        class="btn btn-primary"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#bidModal">
+                                    <i class="bi bi-hammer"></i> Place Bid
+                                </button>
+                             {% endif %}
                         {% else %}
                             <p class="text-muted mb-0">Please <a href="{% url 'login' %}">log in</a> to add to watchlist or place a bid.</p>
                         {% endif %}
-                        <!-- Close Auction button Modal -->
+                        <!-- Include owner only close auction Modal -->
                         {% include "auctions/close_auction.html" %}
                     </div>
-                    <!-- Comments Section here -->
+                    <!-- Include comments Section -->
                     {% include "auctions/comments.html" %}
-                    <!-- Modal for placing bid -->
+                    <!-- Modal for placing a new bid -->
                     <div class="modal fade"
                          id="bidModal"
                          tabindex="-1"
@@ -186,7 +178,7 @@
             </div>
         </div>
     </div>
-    <!-- javaSript for Modal functionality -->
+    <!-- javaSript for bid modal if there is error -->
     {% if bid_error %}
         <script>
             document.addEventListener("DOMContentLoaded", function () {

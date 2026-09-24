@@ -69,11 +69,20 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
-### 5. (Optional) Create an admin user
+### 5. Create a superuser (admin account)
+
+A superuser can log in to the Django admin site to manage users, listings, bids, comments, and categories.
 
 ```bash
 python manage.py createsuperuser
 ```
+
+You'll be prompted for:
+
+- **Username** – e.g. `admin`
+- **Email address** – optional, press Enter to skip
+- **Password** – typed characters are hidden; you'll be asked to confirm it
+
 
 ### 6. Run the development server
 
@@ -82,6 +91,20 @@ python manage.py runserver
 ```
 
 Open http://127.0.0.1:8000/ in your browser.
+
+## Admin Management
+
+1. Make sure the server is running (`python manage.py runserver`).
+2. Go to http://127.0.0.1:8000/admin/
+3. Log in with the superuser username and password you created in step 5.
+
+From the admin panel you can add, edit, or delete users, categories, listings, bids, and comments.
+
+To reset a forgotten admin password:
+
+```bash
+python manage.py changepassword <username>
+```
 
 ## URL Overview
 

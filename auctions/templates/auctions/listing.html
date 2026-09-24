@@ -26,13 +26,6 @@
                             </p>
                         <p><strong>Category:</strong> {{ listing.category }}</p>
                         <p><strong>Created at:</strong> {{ listing.created_at }}</p>
-                        {% if listing.end_time %}
-                            {% if listing.is_expired %}
-                                <p class="text-danger mb-0"><i class="fa fa-hourglass-end"></i> Ended at: {{ listing.end_time }}</p>
-                        {% else %}
-                            <p class="text-muted mb-0"><i class="fa fa-hourglass-half"></i><strong> Ends at:</strong> {{ listing.end_time }}</p>
-                            {% endif %}
-                        {% endif %}
                         <p><strong>Owner:</strong> {{ listing.owner.username }}</p>
                     </div>
 

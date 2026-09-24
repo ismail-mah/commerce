@@ -26,13 +26,6 @@
                                 <h5 class="card-title">{{ listing.title }}</h5>
                                 <p class="card-text">Price: ${{ listing.price }}</p>
                                 <p class="text-muted"><i class="fas fa-clock"></i> {{ listing.created_at }}</p>
-                                {% if listing.end_time %}
-                                    {% if listing.is_expired %}
-                                        <p class="text-danger"><i class="fa fa-hourglass-end"></i> Ended at: {{ listing.end_time }}</p>
-                                    {% else %}
-                                        <p class="text-muted"><i class="fa fa-hourglass-half"></i> Ends at: {{ listing.end_time }}</p>
-                                    {% endif %}
-                                {% endif %}
                                 <a href="{% url 'listing' listing.id %}" class="btn btn-primary mt-auto stretched-link">View Listing</a>
                             </div>
                         </div>

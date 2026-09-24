@@ -20,8 +20,7 @@ class ListingForm(forms.ModelForm):
             'description',
             'price',
             'image_url',
-            'category',
-            'end_time'
+            'category'
         ]
 
         widgets = {
@@ -30,5 +29,4 @@ class ListingForm(forms.ModelForm):
             'price': forms.NumberInput(attrs={'class': 'form-control'}),
             'image_url': forms.URLInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-select'}),
-            'end_time': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
         }

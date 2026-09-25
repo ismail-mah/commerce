@@ -29,9 +29,16 @@
                         </p>
                         <p>
                             <i class="bi bi-cash-stack"></i>
-                            <strong>Current price:</strong>
-                            ${{ current_price }}
+                            <strong>Starting price</strong>
+                            ${{ listing.price }}
                         </p>
+                        {% if current_price != listing.price %}
+                            <p>
+                                <i class="bi bi-graph-up-arrow"></i>
+                                <strong>Current price:</strong>
+                                ${{ current_price }}
+                            </p>
+                        {% endif %}
                         <div class="d-flex align-items-center gap-2 mb-3">
                             <span><strong><i class="bi bi-wallet2"></i>
                             Number of bids:</strong></span>
@@ -40,7 +47,7 @@
                         {% if user_bid %}
                             <p>
                                 <i class="bi bi-cash-coin"></i>
-                                <strong>Your added bid:</strong> ${{ user_bid.amount }}
+                                <strong>Your bid:</strong> ${{ user_bid.amount }}
                             </p>
                         {% endif %}
                         <p>
@@ -89,14 +96,14 @@
                                 </form>
                             {% endif %}
                             <!-- Trigger bid  modal -->
-                             {% if listing.active and listing.owner != user %}
+                            {% if listing.active and listing.owner != user %}
                                 <button type="button"
                                         class="btn btn-primary"
                                         data-bs-toggle="modal"
                                         data-bs-target="#bidModal">
                                     <i class="bi bi-hammer"></i> Place Bid
                                 </button>
-                             {% endif %}
+                            {% endif %}
                         {% else %}
                             <p class="text-muted mb-0">Please <a href="{% url 'login' %}">log in</a> to add to watchlist or place a bid.</p>
                         {% endif %}
@@ -140,7 +147,7 @@
                                                 </div>
                                                 <p>Current Bid: ${{ current_price }}</p>
                                                 {% if user_bid %}
-                                                    <p>Your added bid: ${{ user_bid.amount }}</p>
+                                                    <p>Your bid: ${{ user_bid.amount }}</p>
                                                 {% endif %}
                                                 <div class="input-group">
                                                     <span class="input-group-text">$</span>

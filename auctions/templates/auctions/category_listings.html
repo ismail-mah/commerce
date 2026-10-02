@@ -21,7 +21,7 @@
             {% if listings %}
                 {% for listing in listings %}
                     <div class="col-md-4 mb-4 d-flex">
-                        <div class="card card-hover w-100 position-relative">
+                        <div class="card border-0 shadow-sm w-100 position-relative global-card">
                             {% if listing.image_url %}
                                 <img src="{{ listing.image_url }}"
                                      class="card-img-top"

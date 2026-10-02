@@ -26,18 +26,13 @@ main {
     object-fit: contain;
 }
 
-.card:hover {
-  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
-  transition: box-shadow .2s ease;
-}
-
-
-.category-card {
+.global-card {
   border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.category-card:hover {
+.global-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
 }
@@ -74,27 +69,6 @@ main {
   color: #38bdf8 !important;
   font-weight: 600;
 }
-
-/* .navbar .navbar-nav .nav-link {
-  position: relative;
-  padding-bottom: 4px;
-}
-
-.navbar .navbar-nav .nav-link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -2px;
-  width: 0%;
-  height: 2px;
-  background-color: #38bdf8;
-  transition: width 0.25s ease;
-  border-radius: 2px;
-}
-
-.navbar .navbar-nav .nav-link.active::after {
-  width: 100%;
-} */
 
 .login-container {
   max-width: 480px;

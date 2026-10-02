@@ -6,7 +6,7 @@
             <h2 class="mb-0">Categories</h2>
             {% if user.is_authenticated %}
                 <a href="{% url 'create_category' %}"
-                class="btn btn-sm btn-outline-primary">
+                   class="btn btn-sm btn-outline-primary">
                     <i class="bi bi-plus-lg"></i> Add New Category
                 </a>
             {% endif %}
@@ -17,7 +17,7 @@
                 {% for category in categories %}
                     <div class="col-md-3 col-sm-6">
                         <a href="{% url 'category_listings' category.id %}"
-                        class="card h-100 border-0 shadow-sm text-decoration-none text-dark category-card">
+                           class="card h-100 border-0 shadow-sm text-decoration-none text-dark global-card">
                             <div class="card-body text-center py-4">
                                 <i class="bi bi-tag-fill text-primary fs-2 d-block mb-3"></i>
                                 <h6 class="fw-semibold mb-1">{{ category.name }}</h6>
